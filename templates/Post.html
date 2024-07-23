@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home Page</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        clifford: '#da373d',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+<div class="flex">
+    <form method="post" class="flex">
+        <div class="relative mt-4 group-[.active]:translate-x-[35.2vw]
+             transition-all duration-300 ease-in`" 
+             style="transition-delay: 100ms">
+            <input id="fld" class='peer rounded-t bg-slate-700 h-7 min-w-[30vw]
+                placeholder-transparent focus:outline-none border-b-2 text-slate-200
+                border-blue-500 p-2 valid:border-green-600 invalid:border-red-500
+                transition-all' 
+{#                   onInput={(e: any)=> setUser({...User, [fl.id]: e.target.value.trim()})}#}
+                type="text" required placeholder='[Placeholder]'>
+            <label for="fld" class='text-sm absolute left-0 -top-6 transition-all text-gray-400
+                peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-200
+                peer-placeholder-shown:top-0 peer-placeholder-shown:left-2
+                peer-focus:text-sm peer-focus:left-0 peer-focus:-top-6
+                peer-focus:text-gray-400'>{fl.name}
+            </label>
+        </div>
+    </form>
+</div>
+</body>
+</html>
