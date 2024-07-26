@@ -13,6 +13,9 @@ def data(request):
     name = request.user
     return url, name
 
+def is_ajax(request):
+    return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
+
 def auth(request):
     profiles = UserProfilePage()
     forms = CreateUser()
@@ -57,26 +60,36 @@ def logout_user(request):
 
 
 def home(request):
-    posts = Post.objects.all()
+    posts = Post.objects.all().order_by('-date_created')
     cmnts = Comment.objects.all()
     cmtf = CmntForm()
-    if request.method == 'POST':
-        print("We're In")
-        cmtf = CmntForm(request.POST)
-        idm = request.POST.get("ID")
-        print(idm, request.POST)
-        if cmtf.is_valid():
-            cmt = cmtf.save(commit=False)
-            post = Post.objects.get(id=idm)
+    pstf = PstForm()
+    print(request.method, is_ajax(request), request.POST.get('Act'))
+    if request.method == 'POST' and is_ajax(request) and request.POST.get('Act') == "Comment":
+        print("Comment ?")
+        print(request.POST.get('Act'), request.POST.get('Cmt'))
+        if len(request.POST.get('Cmt')) > 0:
+            cmt = Comment()
+            post = Post.objects.get(id=request.POST.get('ID'))
             cmt.not_post_method_ok = post
             cmt.op = request.user
-            cmt.comment = request.POST.get("Cmt")
+            cmt.comment = request.POST.get('Cmt')
             cmt.save()
-            print("Done")
+            print("Comment Saved")
+    elif request.method == 'POST':
+        pstf = PstForm(request.POST, request.FILES)
+        print(pstf.is_valid(), pstf.errors)
+        if pstf.is_valid():
+            pstf.save(commit=False)
+            pstf.op = request.user
+            pstf.save()
+            print("Post Added")
     ctx = {
         'cmtf': cmtf,
+        'pstf': PstForm,
         'posts': posts,
         'cmnts': cmnts,
         'user': data(request)[1],
+        'acc': request.user,
     }
     return render(request, "Home.html", ctx)

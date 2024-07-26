@@ -8,7 +8,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="module">
-    import heroicons from 'https://cdn.jsdelivr.net/npm/heroicons@2.1.5/+esm'
+        import heroicons from 'https://cdn.jsdelivr.net/npm/heroicons@2.1.5/+esm'
     </script>
     <script>
         tailwind.config = {
@@ -22,35 +22,81 @@
         }
     </script>
 </head>
-<body class="bg-slate-950">
+<body class="relative bg-slate-950 transition-all">
+{#<div class="absolute p-3 bg-blue-200 m-4 rounded-lg top-32 -right-4 transition-all transform -translate-x-12">#}
+{#    Comment Sent</div>#}
 <h1 class="text-3xl ml-2 text-align-center text-white">Welcome, {{ user }}</h1>
-<div class="flex justify-center">
+<div class="grid justify-center">
+    {% if acc.is_staff %}
+        <div>
+            <form method="post" enctype="multipart/form-data"
+                  class="grid gap-4 flex-wrap p-4 border-2 bg-slate-900 rounded-lg">
+                {% csrf_token %}
+                {% for fld in pstf %}
+                    <div class="relative mt-4 group-[.active]:translate-x-[35.2vw]
+                    transition-all duration-300 ease-in`" style="transition-delay: 100ms">
+                        {{ fld }}
+                        <label for="id_{{ fld.name }}" class='text-sm absolute left-0 -top-6 transition-all text-gray-400
+                            peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-200
+                            peer-placeholder-shown:top-0 peer-placeholder-shown:left-2
+                            peer-focus:text-sm peer-focus:left-0 peer-focus:-top-6
+                            peer-focus:text-gray-400'>{{ fld.label }}
+                        </label>
+                    </div>
+                {% endfor %}
+                <button class="rounded-md bg-blue-700 p-2 text-slate-200" type="submit">Post</button>
+            </form>
+        </div>
+    {% endif %} f %}
+    <div></div>
     {% for post in posts %}
-    	<div class="border-2 bg-slate-700 min-w-[25vw] w-fit h-fit rounded-lg mt-5 flex-wrap
+        <div class="border-2 bg-slate-700 min-w-[25vw] w-fit h-fit rounded-lg mt-5 flex-wrap
             max-h-[55vh] overflow-x-hidden max-w-[40vw]">
             <div class="transition-all group" id="Post{{ post.id }}">
                 <img src="{{ post.Img.url }}" alt="{{ post.Title }}"
-                     class="rounded-lg h-[50vh] group-[.flex]:h-10 transition-all w-auto" id="Img{{ post.id }}">
-                <div class="flex gap-2 mb-2 text-slate-200 ml-3 peer tiny w-full group-[.flex]:w-fit">
-                    <span class="mt-2 flex-none">{% heroicon_outline "hand-thumb-up" %}</span>
-                    <h1 class="mt-2 flex-auto max-w-[20vw] truncate">{{ post.Title }}{% lorem %}</h1>
-                    <span class="mt-2 flex-1">{% heroicon_outline "hand-thumb-down" %}</span>
-                    <button onclick="BldUp('{{ post.id }}', '{{ post.Descrp }}')" class="mt-2 flex-1 order-last float-right">
+                     class="rounded-lg h-[50vh] group-[.flex]:h-10 transition-all w-fit" id="Img{{ post.id }}">
+                <div class="grid grid-col-12 grid-flow-col gap-2 mb-2 text-slate-200 ml-3 peer tiny
+                    w-full group-[.flex]:w-fit">
+{#                    <span class="mt-2 flex-none">{% heroicon_outline "hand-thumb-up" %}</span>#}
+                    <h1 class="mt-2 col-span-10 max-w-[20vw] truncate">{{ post.Title }}</h1>
+{#                    <span class="mt-2 flex-1">{% heroicon_outline "hand-thumb-down" %}</span>#}
+                    <span class="mt-2 col-span-1">Comment</span>
+                    <button onclick="BldUp('{{ post.id }}', '{{ post.Descrp }}')"
+                            class="mt-2 flex-1 col-span-1">
                         {% heroicon_outline "queue-list" %}</button>
                 </div>
             </div>
-            <div class="" id="Cmnt{{ post.id }}"></div>
-            <div class="grid p-3 mt-5">
+            <div class="hidden p-4" id="Cmnt{{ post.id }}">
+                <form class="CmntForm flex flex-wrap text-white" id="Form{{ post.id }}"
+                      onsubmit="Comment_Form({{ post.id }}); return false;" method="POST">
+                    {% csrf_token %}
+{#                    {% for cfld in cmtf %}#}
+{#                        {{ cfld }}#}
+{#                    {% if cfld.name == "not_post_method_ok" %}#}
+{#                    	{{ cfld.value }}#}
+{#                    {% endif %}#}
+{#                    {% endfor %}#}
+                    <label>
+                        <textarea class="rounded-t bg-slate-700 h-32 min-w-[30vw] focus:outline-none 
+                        border-2 mt-4 text-slate-200 border-blue-500 p-2 valid:border-green-600
+                            invalid:border-red-500 transition-all" id="CmtFrm{{ post.id }}" 
+                                  placeholder="Enter Comment Here"></textarea>
+                    </label>
+                    <button class="rounded-md mt-4 h-32 bg-blue-700 p-2 text-slate-200" type="submit">Comment</button>
+                </form>
+            </div>
+            <div class="grid p-3 mt-5 gap-2">
                 {% for cmnt in post.comment_set.all %}
-                	<div class="text-slate-200 border-2 rounded-lg p-3">
+                    <div class="text-slate-200 border-2 rounded-lg p-3">
                         <div class="flex gap-2">
-                            <img class="w-4 h-4 rounded-full" src="{{ cmnt.op.userprofile.Profile_pic.url }}" alt="{{ cmnt.op.username }}">
+                            <img class="w-4 h-4 rounded-full" src="{{ cmnt.op.userprofile.Profile_pic.url }}"
+                                 alt="{{ cmnt.op.username }}">
                             <span class="inline-block align-text-top text-slate-400">{{ cmnt.op.username }}</span>
                         </div>
                         <p>{{ cmnt.comment }}</p>
                     </div>
                 {% empty %}
-                	<p>No comments</p>
+                    <p class="text-white">No comments</p>
                 {% endfor %}
             </div>
         </div>
@@ -64,6 +110,7 @@
         integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
         crossorigin="anonymous">
 </script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
 <script type="text/javascript">
     function getCookie(c_name) {
         if (document.cookie.length > 0) {
@@ -80,19 +127,9 @@
 
     function BldUp(PostID, Descrp) {
         document.getElementById(`Post${PostID}`).classList.toggle('flex')
-        document.getElementById(`Cmnt${PostID}`).innerHTML += `<div class="p-2">` +
-            `<form class="flex flex-wrap text-white" onsubmit="Comment_Form(${PostID});return false;" method="post">` +
-            `{% csrf_token %}` +
-            `{% for cfld in cmtf %}{{ cfld }}{% endfor %}` +
-            `<button class="rounded-md bg-blue-700 p-2 text-slate-200" type="submit">Comment</button>` +
-            '</from>' +
-            `{% for cmnt in cmnts %}
-
-            {% endfor %}
-            ` +
-            '</div>'
+        document.getElementById(`Cmnt${PostID}`).classList.toggle('hidden')
     }
-    
+
     function Comment_Form(FormId) {
         $.ajaxSetup({
             headers: {"X-CSRFToken": getCookie("csrftoken")}
@@ -104,13 +141,16 @@
             async: true,
             data: {
                 'Act': 'Comment',
-                'Cmt': document.getElementById("Reply-" + Cmnt_Chn).value,
+                'Cmt': document.getElementById(`CmtFrm${FormId}`).value,
                 'ID': FormId,
             },
             complete: function () {
                 console.log("Commented")
+                document.getElementById(`Cmnt${FormId}`).innerHTML = "<p class='p-5 text-slate-200 text-center text-3xl'>" +
+                    "Feedback Sent</p>"
             }
         });
+        return false;
     }
 </script>
 </body>

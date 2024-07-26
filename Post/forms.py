@@ -98,3 +98,4 @@ class CmntForm(forms.ModelForm):
         super(CmntForm, self).__init__(*args, **kwargs)
 
         self.fields['comment'].widget.attrs['class'] = INPF
+
